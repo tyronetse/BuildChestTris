@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Body Beast: Build Chest/Tris</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f4f1ea;
+    --ink: #141414;
+    --muted: #7a766e;
+    --accent: #d9531e;
+    --card: #ffffff;
+    --line: #ddd8cc;
+    --warn-bg: #efe8da;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    padding: 20px 16px 40px;
+    max-width: 640px;
+    margin: 0 auto;
+    -webkit-font-smoothing: antialiased;
+  }
+  .kicker {
+    color: var(--accent);
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-size: 64px;
+    line-height: 0.95;
+    font-weight: 900;
+    letter-spacing: -1.5px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    font-stretch: condensed;
+  }
+  .lede {
+    color: #5c574e;
+    font-size: 17px;
+    line-height: 1.55;
+    margin-bottom: 22px;
+  }
+  .stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .stat {
+    background: var(--card);
+    border: 1px solid var(--line);
+    padding: 18px 16px;
+  }
+  .stat .num {
+    font-size: 38px;
+    font-weight: 900;
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+  .stat .lbl {
+    color: var(--muted);
+    font-size: 15px;
+    margin-top: 6px;
+  }
+  .warn {
+    background: var(--warn-bg);
+    padding: 18px 16px 18px 52px;
+    position: relative;
+    font-size: 16px;
+    line-height: 1.55;
+    color: #5c574e;
+    margin-bottom: 26px;
+  }
+  .warn::before {
+    content: "⚠";
+    position: absolute;
+    left: 16px;
+    top: 16px;
+    font-size: 22px;
+    color: var(--accent);
+  }
+  .divider {
+    border: none;
+    border-top: 1px solid var(--line);
+    margin: 26px -16px;
+  }
+  .workout-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+  }
+  .workout-head h2 {
+    font-size: 38px;
+    font-weight: 900;
+    letter-spacing: -1px;
+    text-transform: uppercase;
+  }
+  .set-counter {
+    color: var(--muted);
+    font-size: 16px;
+    font-weight: 600;
+  }
+  .progress {
+    height: 8px;
+    background: #e4ded2;
+    margin-bottom: 22px;
+  }
+  .progress .fill {
+    height: 100%;
+    width: 0%;
+    background: var(--accent);
+    transition: width 0.3s;
+  }
+  .circuit {
+    margin-bottom: 28px;
+  }
+  .circuit > h3 {
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+  .circuit .rounds {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+  .exercise {
+    background: var(--card);
+    border: 1px solid var(--line);
+    margin-bottom: 12px;
+  }
+  .exercise.active {
+    border: 2px solid var(--accent);
+  }
+  .exercise.done {
+    opacity: 0.55;
+  }
+  .exercise-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 14px 10px;
+  }
+  .exercise-name {
+    font-size: 17px;
+    font-weight: 700;
+  }
+  .exercise-reps {
+    color: var(--accent);
+    font-weight: 800;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+  .exercise video {
+    width: 100%;
+    display: block;
+    background: #000;
+    aspect-ratio: 16/9;
+  }
+  .exercise .note {
+    padding: 10px 14px 14px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .top-controls { margin-bottom: 14px; }
+  .top-controls .btn { width: 100%; }
+  .controls {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 10px;
+    position: sticky;
+    bottom: 12px;
+    margin-top: 8px;
+  }
+  .btn {
+    font-size: 17px;
+    font-weight: 700;
+    padding: 18px 0;
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--ink);
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn:disabled { opacity: 0.35; }
+  .btn.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .btn.primary:disabled { opacity: 0.5; }
+  .finish {
+    text-align: center;
+    padding: 30px 10px;
+    display: none;
+  }
+  .finish h2 { font-size: 34px; font-weight: 900; text-transform: uppercase; margin-bottom: 10px; }
+  .finish p { color: var(--muted); font-size: 16px; }
+  .now-playing {
+    background: var(--card);
+    border: 1px solid var(--line);
+    margin-bottom: 16px;
+    position: sticky;
+    top: 8px;
+    z-index: 10;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+  }
+  .np-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 14px;
+  }
+  .np-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; }
+  .np-name { font-size: 18px; font-weight: 800; }
+  .np-timer { font-size: 34px; font-weight: 900; letter-spacing: -1px; font-variant-numeric: tabular-nums; }
+  .now-playing video { width: 100%; display: block; background: #000; aspect-ratio: 16/9; }
+  .np-note { padding: 8px 14px 12px; font-size: 13px; color: var(--muted); }
+  .np-note:empty { display: none; }
+  .np-weight {
+    display: flex; align-items: center; gap: 8px;
+    padding: 0 14px 14px; font-size: 14px; color: var(--muted);
+  }
+  .np-weight input {
+    width: 80px; padding: 8px 10px; font-size: 16px; font-weight: 700;
+    border: 1px solid var(--line); font-family: inherit; color: var(--ink);
+    background: var(--bg);
+  }
+  .np-last { font-size: 13px; }
+  .np-durations {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 14px 14px; font-size: 13px; color: var(--muted);
+  }
+  .np-durations button {
+    border: 1px solid var(--line); background: var(--bg);
+    padding: 6px 12px; font-size: 14px; font-weight: 700;
+    cursor: pointer; font-family: inherit; color: var(--ink);
+  }
+  .np-durations button.sel { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .rest-timer {
+    text-align: center;
+    padding: 14px;
+    background: var(--warn-bg);
+    border: 1px solid var(--line);
+    margin-bottom: 12px;
+    display: none;
+  }
+  .rest-timer .t { font-size: 34px; font-weight: 900; }
+  .rest-timer .l { font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="kicker">Build Phase · Chest &amp; Tris</div>
+<h1>Chest<br>&amp; Tris</h1>
+<p class="lede">Build-phase chest and triceps for mass: single sets, super sets and a giant set, finishing with a 60-second dip and ab burnout. Tap any set to jump to it, log your dumbbell weight, and let the rest timer run.</p>
+
+<div class="stats">
+  <div class="stat"><div class="num">50</div><div class="lbl">minutes</div></div>
+  <div class="stat"><div class="num">6</div><div class="lbl">blocks</div></div>
+  <div class="stat"><div class="num">37</div><div class="lbl">total sets</div></div>
+  <div class="stat"><div class="num">8–15</div><div class="lbl">reps per set</div></div>
+</div>
+
+<div class="warn">These are short AI-generated movement demos, not coaching. Use a weight you can control, keep your range pain-free, and ask a qualified trainer when form is uncertain.</div>
+
+<hr class="divider">
+
+<div class="workout-head">
+  <h2>Workout Mode</h2>
+  <div style="text-align:right;">
+    <div class="set-counter" id="setCounter">Set 1 of 37</div>
+    <div class="set-counter" id="elapsedTimer" style="font-size:14px;">0:00</div>
+  </div>
+</div>
+<div class="top-controls">
+  <button class="btn" id="btnStartPause">Start workout</button>
+</div>
+<div class="progress"><div class="fill" id="progressFill"></div></div>
+<div class="now-playing" id="nowPlaying">
+  <div class="np-head">
+    <div>
+      <div class="np-label">Now</div>
+      <div class="np-name" id="npName">Tap Start workout</div>
+    </div>
+    <div class="np-timer" id="setTimer">1:00</div>
+  </div>
+  <video id="npVideo" controls playsinline preload="metadata" loop muted></video>
+  <div class="np-note" id="npNote"></div>
+  <div class="np-weight">
+    <span>Weight:</span>
+    <input type="number" id="weightInput" min="0" step="2.5" placeholder="0" inputmode="decimal">
+    <span>lbs</span>
+    <span class="np-last" id="weightLast"></span>
+  </div>
+  <div class="np-durations">
+    <span>Set timer:</span>
+    <button data-dur="30">30s</button>
+    <button data-dur="45">45s</button>
+    <button data-dur="60" class="sel">60s</button>
+    <button data-dur="90">90s</button>
+  </div>
+</div>
+
+<div class="rest-timer" id="restTimer">
+  <div class="t" id="restTime">60</div>
+  <div class="l">seconds rest — tap Complete set to skip</div>
+  <div class="np-durations" style="justify-content:center; padding-bottom:4px;">
+    <button data-rdur="30">30s</button>
+    <button data-rdur="45">45s</button>
+    <button data-rdur="60" class="sel">60s</button>
+    <button data-rdur="90">90s</button>
+  </div>
+</div>
+
+<div id="circuits"></div>
+
+<div class="finish" id="finish">
+  <h2>Beast mode complete</h2>
+  <p>37 sets done. Cool down and stretch — you earned it.</p>
+</div>
+
+<div class="controls" id="controls">
+  <button class="btn" id="btnBack">Back</button>
+  <button class="btn primary" id="btnComplete">Complete set</button>
+  <button class="btn" id="btnNext">Next</button>
+</div>
+
+<script>
+const CIRCUITS = [
+  { name: "Block 1 · Single Set", rounds: "Dumbbell Chest Press · 15-12-8-8",
+    sets: [
+      { name: "Dumbbell Chest Press", video: "dumbbell-chest-press.mp4", reps: 15, note: "Press up over your chest, lower with control" },
+      { name: "Dumbbell Chest Press", video: "dumbbell-chest-press.mp4", reps: 12, note: "Press up over your chest, lower with control" },
+      { name: "Dumbbell Chest Press", video: "dumbbell-chest-press.mp4", reps: 8, note: "Heavier — press up over your chest, lower with control" },
+      { name: "Dumbbell Chest Press", video: "dumbbell-chest-press.mp4", reps: 8, note: "Drop set — lighter weight, same strict form" },
+    ]},
+  { name: "Block 2 · Super Set", rounds: "Incline Dumbbell Fly &#8596; Incline Dumbbell Press",
+    sets: [
+      { name: "Incline Dumbbell Fly", video: "incline-dumbbell-fly.mp4", reps: 15, note: "Slight bend in the elbows, squeeze at the top" },
+      { name: "Incline Dumbbell Press", video: "incline-dumbbell-press.mp4", reps: 15, note: "Press up and together at the top" },
+      { name: "Incline Dumbbell Fly", video: "incline-dumbbell-fly.mp4", reps: 12, note: "Slight bend in the elbows, squeeze at the top" },
+      { name: "Incline Dumbbell Press", video: "incline-dumbbell-press.mp4", reps: 12, note: "Press up and together at the top" },
+      { name: "Incline Dumbbell Fly", video: "incline-dumbbell-fly.mp4", reps: 8, note: "Heavier — slight bend in the elbows" },
+      { name: "Incline Dumbbell Press", video: "incline-dumbbell-press.mp4", reps: 8, note: "Heavier — press up and together" },
+      { name: "Incline Dumbbell Press", video: "incline-dumbbell-press.mp4", reps: 8, note: "Drop set — lighter weight, press up and together" },
+    ]},
+  { name: "Block 3 · Giant Set", rounds: "Close Grip Press / Partial Chest Fly / Decline Push-Up",
+    sets: [
+      { name: "Close Grip Press", video: "close-grip-press.mp4", reps: 15, note: "Dumbbells pressed together, lower to your chest" },
+      { name: "Partial Chest Fly", video: "partial-chest-fly.mp4", reps: 15, note: "Partial range — lower halfway, squeeze back up" },
+      { name: "Decline Push-Up", video: "decline-pushup.mp4", reps: 15, note: "Feet elevated, chest to the floor" },
+      { name: "Close Grip Press", video: "close-grip-press.mp4", reps: 12, note: "Dumbbells pressed together, lower to your chest" },
+      { name: "Partial Chest Fly", video: "partial-chest-fly.mp4", reps: 12, note: "Partial range — lower halfway, squeeze back up" },
+      { name: "Decline Push-Up", video: "decline-pushup.mp4", reps: 12, note: "Feet elevated, chest to the floor" },
+      { name: "Close Grip Press", video: "close-grip-press.mp4", reps: 8, note: "Heavier — dumbbells pressed together" },
+      { name: "Partial Chest Fly", video: "partial-chest-fly.mp4", reps: 8, note: "Heavier — partial range, squeeze at the top" },
+      { name: "Decline Push-Up", video: "decline-pushup.mp4", reps: 8, note: "Feet elevated, chest to the floor" },
+    ]},
+  { name: "Block 4 · Single Set", rounds: "Triceps Extension · 15-12-8-8",
+    sets: [
+      { name: "Triceps Extension", video: "tricep-extension.mp4", reps: 15, note: "Elbows still, extend through the triceps" },
+      { name: "Triceps Extension", video: "tricep-extension.mp4", reps: 12, note: "Elbows still, extend through the triceps" },
+      { name: "Triceps Extension", video: "tricep-extension.mp4", reps: 8, note: "Heavier — elbows still, full extension" },
+      { name: "Triceps Extension", video: "tricep-extension.mp4", reps: 8, note: "Drop set — lighter weight, full extension" },
+    ]},
+  { name: "Block 5 · Super Set", rounds: "Single Arm Kickback &#8596; Triceps Push-Up",
+    sets: [
+      { name: "Single Arm Kickback — Left", video: "tricep-kickback.mp4", reps: 15, note: "Hinge forward, elbow pinned at your side" },
+      { name: "Single Arm Kickback — Right", video: "tricep-kickback.mp4", reps: 15, note: "Hinge forward, elbow pinned at your side" },
+      { name: "Triceps Push-Up", video: "diamond-pushup.mp4", reps: 15, note: "Diamond push-up — hands close under your chest" },
+      { name: "Single Arm Kickback — Left", video: "tricep-kickback.mp4", reps: 12, note: "Hinge forward, elbow pinned at your side" },
+      { name: "Single Arm Kickback — Right", video: "tricep-kickback.mp4", reps: 12, note: "Hinge forward, elbow pinned at your side" },
+      { name: "Triceps Push-Up", video: "diamond-pushup.mp4", reps: 12, note: "Diamond push-up — hands close under your chest" },
+      { name: "Single Arm Kickback — Left", video: "tricep-kickback.mp4", reps: 8, note: "Heavier — hinge forward, elbow pinned" },
+      { name: "Single Arm Kickback — Left", video: "tricep-kickback.mp4", reps: 8, note: "Drop set — lighter, elbow pinned at your side" },
+      { name: "Single Arm Kickback — Right", video: "tricep-kickback.mp4", reps: 8, note: "Heavier — hinge forward, elbow pinned" },
+      { name: "Single Arm Kickback — Right", video: "tricep-kickback.mp4", reps: 8, note: "Drop set — lighter, elbow pinned at your side" },
+      { name: "Triceps Push-Up", video: "diamond-pushup.mp4", reps: 8, note: "Diamond push-up — hands close under your chest" },
+    ]},
+  { name: "Block 6 · Super Set · 60s", rounds: "Dips on Bench &#8596; Ins and Outs — 60 seconds each",
+    sets: [
+      { name: "Dips on Bench", video: "bench-dips.mp4", reps: 60, unit: "sec", note: "Hands on the bench behind you, lower to 90°" },
+      { name: "Ins and Outs", video: "ins-and-outs.mp4", reps: 60, unit: "sec", note: "Seated — extend legs out, tuck knees to chest" },
+    ]},
+];
+
+const SETS = [];
+CIRCUITS.forEach((c, ci) => {
+  c.sets.forEach((s) => {
+    SETS.push({ block: ci, ...s });
+  });
+});
+const TOTAL = SETS.length;
+
+const circuitsEl = document.getElementById('circuits');
+let setIdx = 0;
+CIRCUITS.forEach((c, ci) => {
+  const div = document.createElement('div');
+  div.className = 'circuit';
+  div.innerHTML = `<h3>${c.name}</h3><div class="rounds">${c.rounds}</div>` +
+    c.sets.map((e) => {
+      const i = setIdx++;
+      return `
+      <div class="exercise" id="ex-${i}" data-idx="${i}">
+        <div class="exercise-top">
+          <span class="exercise-name">${e.name}</span>
+          <span class="exercise-reps">${e.reps} ${e.unit || "reps"}</span>
+        </div>
+        ${e.note ? `<div class="note">${e.note}</div>` : ''}
+      </div>`;
+    }).join('');
+  circuitsEl.appendChild(div);
+});
+
+// ---------- State ----------
+let current = 0;            // index of active set
+let mode = 'idle';          // 'idle' | 'exercise' | 'rest' | 'paused' | 'done'
+let pausedFrom = null;      // mode to return to on resume
+let setTick = null;
+let restTick = null, restLeft = 0;
+let workoutStart = null, elapsedTick = null;
+
+const setCounter = document.getElementById('setCounter');
+const elapsedEl = document.getElementById('elapsedTimer');
+const progressFill = document.getElementById('progressFill');
+const btnBack = document.getElementById('btnBack');
+const btnComplete = document.getElementById('btnComplete');
+const btnNext = document.getElementById('btnNext');
+const restTimer = document.getElementById('restTimer');
+const restTime = document.getElementById('restTime');
+const npName = document.getElementById('npName');
+const npVideo = document.getElementById('npVideo');
+npVideo.muted = true; // keep demo videos silent so phone music keeps playing
+const npNote = document.getElementById('npNote');
+const setTimerEl = document.getElementById('setTimer');
+const nowPlaying = document.getElementById('nowPlaying');
+
+function fmt(s) {
+  return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+}
+
+// ---------- Audio ----------
+let audioCtx = null;
+function unlockAudio() {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  } catch (e) {}
+}
+function playBeep() {
+  try {
+    unlockAudio();
+    if (!audioCtx) return;
+    // Intense alarm: 4 loud square-wave beeps, rising on the last one —
+    // cuts through music playing on the phone
+    [0, 0.22, 0.44, 0.66].forEach((d, i) => {
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.connect(g); g.connect(audioCtx.destination);
+      o.frequency.value = [990, 990, 990, 1485][i];
+      o.type = 'square';
+      const t = audioCtx.currentTime + d;
+      g.gain.setValueAtTime(0.001, t);
+      g.gain.exponentialRampToValueAtTime(1.0, t + 0.02);
+      g.gain.setValueAtTime(1.0, t + 0.14);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+      o.start(t); o.stop(t + 0.2);
+    });
+  } catch (e) {}
+}
+
+// ---------- Timers ----------
+const weightInput = document.getElementById('weightInput');
+const weightLast = document.getElementById('weightLast');
+function weightKey(name) { return 'bs_weight_' + name; }
+function loadWeight(name) {
+  const saved = localStorage.getItem(weightKey(name));
+  weightInput.value = saved || '';
+  weightLast.textContent = saved ? `Last: ${saved} lbs` : '';
+}
+weightInput.addEventListener('change', () => {
+  if (current < SETS.length) {
+    const v = weightInput.value.trim();
+    if (v) localStorage.setItem(weightKey(SETS[current].name), v);
+    else localStorage.removeItem(weightKey(SETS[current].name));
+    loadWeight(SETS[current].name);
+  }
+});
+function loadNowPlaying() {
+  if (current < SETS.length) {
+    const s = SETS[current];
+    npName.textContent = `Set ${current + 1}: ${s.name} · ${s.reps} ${s.unit || "reps"}`;
+    npNote.textContent = s.note || '';
+    loadWeight(s.name);
+    if (npVideo.getAttribute('src') !== s.video) {
+      npVideo.setAttribute('src', s.video);
+      npVideo.load();
+    }
+    // Play the demo video right away when jumping to an exercise.
+    // Inside a tap this is a user gesture so it plays; if the browser
+    // blocks programmatic play (e.g. auto-advance), fail silently and
+    // leave the video ready with controls.
+    try {
+      const p = npVideo.play();
+      if (p && p.catch) p.catch(() => {});
+    } catch (e) { /* play() not supported */ }
+  }
+}
+let setDuration = 60;
+let setRemaining = 60;
+function startSetTimer() {
+  stopSetTimer();
+  setRemaining = setDuration;
+  setTimerEl.textContent = fmt(setRemaining);
+  loadNowPlaying();
+  setTick = setInterval(() => {
+    setRemaining--;
+    setTimerEl.textContent = fmt(Math.max(0, setRemaining));
+    if (setRemaining <= 0) {
+      clearInterval(setTick); setTick = null;
+      playBeep();
+    }
+  }, 1000);
+}
+function stopSetTimer() { clearInterval(setTick); setTick = null; }
+document.querySelectorAll('.np-durations button').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.np-durations button').forEach(x => x.classList.remove('sel'));
+    b.classList.add('sel');
+    setDuration = parseInt(b.dataset.dur, 10);
+    if (mode === 'exercise') startSetTimer();
+  });
+});
+
+function startElapsed() {
+  if (workoutStart) return;
+  workoutStart = Date.now();
+  elapsedTick = setInterval(() => {
+    elapsedEl.textContent = fmt(workoutAccum + Math.floor((Date.now() - workoutStart) / 1000));
+  }, 1000);
+}
+function stopElapsed() { clearInterval(elapsedTick); }
+
+let restDuration = 60;
+document.querySelectorAll('[data-rdur]').forEach(b => {
+  b.addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    document.querySelectorAll('[data-rdur]').forEach(x => x.classList.remove('sel'));
+    b.classList.add('sel');
+    restDuration = parseInt(b.dataset.rdur, 10);
+  });
+});
+function startRest() {
+  mode = 'rest';
+  stopSetTimer();
+  restLeft = restDuration;
+  restTime.textContent = restLeft;
+  restTimer.style.display = 'block';
+  btnComplete.textContent = 'Skip rest';
+  clearInterval(restTick);
+  restTick = setInterval(() => {
+    restLeft--;
+    restTime.textContent = restLeft;
+    if (restLeft <= 0) {
+      clearInterval(restTick);
+      playBeep();
+      advanceSet();
+    }
+  }, 1000);
+  // Scroll timer into view so it's visible
+  restTimer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+function stopRest() {
+  clearInterval(restTick); restTick = null;
+  restTimer.style.display = 'none';
+  btnComplete.textContent = 'Complete set';
+}
+
+function advanceSet() {
+  stopRest();
+  current++;
+  if (current >= SETS.length) {
+    mode = 'done';
+    releaseWakeLock();
+    stopElapsed();
+    stopSetTimer();
+    nowPlaying.style.display = 'none';
+    document.getElementById('finish').style.display = 'block';
+    document.getElementById('controls').style.display = 'none';
+    setCounter.textContent = `${TOTAL} of ${TOTAL}`;
+    progressFill.style.width = '100%';
+    markActive();
+    return;
+  }
+  mode = 'exercise';
+  render();
+  startSetTimer();
+}
+
+// ---------- Render ----------
+function markActive() {
+  document.querySelectorAll('.exercise').forEach(el => {
+    el.classList.remove('active'); el.classList.remove('done');
+  });
+  SETS.forEach((s, i) => {
+    const el = document.getElementById(`ex-${i}`);
+    if (!el) return;
+    if (i < current) el.classList.add('done');
+    if (i === current && mode === 'exercise') {
+      el.classList.add('active');
+    }
+  });
+}
+function render() {
+  setCounter.textContent = `Set ${Math.min(current + 1, TOTAL)} of ${TOTAL}`;
+  progressFill.style.width = `${(current / SETS.length) * 100}%`;
+  btnBack.disabled = current === 0 && mode === 'exercise';
+  markActive();
+}
+
+// ---------- Start / Pause ----------
+const btnStartPause = document.getElementById('btnStartPause');
+let workoutAccum = 0;
+
+function pauseAll() {
+  if (mode !== 'exercise' && mode !== 'rest') return;
+  pausedFrom = mode;
+  mode = 'paused';
+  // freeze timers, keeping accumulated values
+  if (setTick) { clearInterval(setTick); setTick = null; }
+  if (elapsedTick) { workoutAccum += Math.floor((Date.now() - workoutStart) / 1000); clearInterval(elapsedTick); elapsedTick = null; workoutStart = null; }
+  if (restTick) { clearInterval(restTick); restTick = null; }
+  btnStartPause.textContent = 'Resume';
+}
+
+function resumeAll() {
+  if (mode !== 'paused') return;
+  mode = pausedFrom || 'exercise';
+  // resume set countdown from where it left off
+  if (mode === 'exercise' && setRemaining > 0) {
+    setTick = setInterval(() => {
+      setRemaining--;
+      setTimerEl.textContent = fmt(Math.max(0, setRemaining));
+      if (setRemaining <= 0) { clearInterval(setTick); setTick = null; playBeep(); }
+    }, 1000);
+  }
+  // resume elapsed
+  workoutStart = Date.now();
+  elapsedTick = setInterval(() => {
+    elapsedEl.textContent = fmt(workoutAccum + Math.floor((Date.now() - workoutStart) / 1000));
+  }, 1000);
+  // resume rest countdown if we were resting
+  if (mode === 'rest') {
+    restTick = setInterval(() => {
+      restLeft--;
+      restTime.textContent = restLeft;
+      if (restLeft <= 0) { clearInterval(restTick); playBeep(); advanceSet(); }
+    }, 1000);
+  }
+  btnStartPause.textContent = 'Pause';
+}
+
+let wakeLock = null;
+async function requestWakeLock() {
+  try {
+    if ('wakeLock' in navigator) {
+      wakeLock = await navigator.wakeLock.request('screen');
+    }
+  } catch (e) {}
+}
+function releaseWakeLock() {
+  try { if (wakeLock) { wakeLock.release(); wakeLock = null; } } catch (e) {}
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && (mode === 'exercise' || mode === 'rest')) {
+    requestWakeLock();
+  }
+});
+
+btnStartPause.addEventListener('click', () => {
+  unlockAudio();
+  if (mode === 'idle') {
+    mode = 'exercise';
+    requestWakeLock();
+    startElapsed();
+    startSetTimer();
+    render();
+    btnStartPause.textContent = 'Pause';
+  } else if (mode === 'paused') {
+    resumeAll();
+  } else if (mode === 'exercise' || mode === 'rest') {
+    pauseAll();
+  }
+});
+
+// Tap a set in the list to jump straight to it
+document.querySelectorAll('.exercise').forEach(el => {
+  el.style.cursor = 'pointer';
+  el.addEventListener('click', () => {
+    const idx = parseInt(el.dataset.idx, 10);
+    if (!isNaN(idx) && idx >= 0 && idx < SETS.length) {
+      stopRest(); stopSetTimer();
+      current = idx; mode = 'exercise';
+      render(); startSetTimer();
+    }
+  });
+});
+
+// ---------- Buttons ----------
+btnComplete.addEventListener('click', () => {
+  unlockAudio();
+  startElapsed();
+  if (mode === 'exercise') {
+    // Finish current set -> rest
+    startRest();
+  } else if (mode === 'rest') {
+    // Skip rest -> next set
+    advanceSet();
+  }
+});
+btnNext.addEventListener('click', () => {
+  unlockAudio();
+  startElapsed();
+  if (mode === 'rest') { advanceSet(); }
+  else if (current < SETS.length - 1) { stopSetTimer(); current++; render(); startSetTimer(); }
+});
+btnBack.addEventListener('click', () => {
+  stopRest();
+  stopSetTimer();
+  if (current > 0) { current--; }
+  mode = 'exercise';
+  render();
+  startSetTimer();
+});
+
+render();
+</script>
+</body>
+</html>
